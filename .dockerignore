@@ -1,0 +1,43 @@
+# Version control
+.git
+.gitignore
+
+# IDE / editor
+.idea
+.vscode
+
+# Python caches
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+
+# Local dev artifacts
+backend/db.sqlite3
+backend/backend.log
+backend/media/
+backend/staticfiles/
+
+# Tests (not needed at runtime)
+backend/tests/
+backend/features/
+backend/pytest.ini
+
+# Node / frontend (excluded from microservice)
+web/
+desktop/
+mobile/
+
+# Docs and scripts
+docs/
+scripts/
+
+# Environment files (secrets must come from k8s secrets / env)
+.env
+.env.*
+!.env.example
+
+# OS artefacts
+.DS_Store
+Thumbs.db

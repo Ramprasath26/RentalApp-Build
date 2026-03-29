@@ -1,0 +1,65 @@
+# ============================================================
+#  RentalApp API — .gitignore  (microservice edition)
+# ============================================================
+
+# ── Secrets & Environment ────────────────────────────────────
+.env
+.env.*
+*.env
+!.env.example
+secrets.json
+credentials.json
+
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ── Django ──────────────────────────────────────────────────
+backend/db.sqlite3
+backend/*.sqlite3
+backend/staticfiles/
+backend/*.log
+
+# Media uploads — keep placeholder, ignore actual uploads
+backend/media/**
+!backend/media/.gitkeep
+
+# ── Pytest / Coverage ────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ── Docker runtime ───────────────────────────────────────────
+# Dockerfile, .dockerignore, entrypoint.sh are intentionally tracked
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS / IDE ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+*~
+
+# ── Temporary ────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.bak
