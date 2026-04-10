@@ -14,6 +14,8 @@ Secrets set
     ACR_NAME, ACR_LOGIN_SERVER
     DOCKERHUB_USERNAME, DOCKERHUB_TOKEN
     SONAR_TOKEN, SONAR_HOST_URL  (optional)
+    GCP_PROJECT_ID, GCP_SERVICE_ACCOUNT, GCR_REGION (optional)
+    GCP_WORKLOAD_IDENTITY_PROVIDER (optional)
 
 Usage
 -----
@@ -148,7 +150,7 @@ def main() -> None:
 
     # ── Resolve target repo ──────────────────────────────────────────────────
     owner = merged.get("GITHUB_ORG", "").strip()
-    repo  = merged.get("GITHUB_REPO", "RentalApp").strip()
+    repo  = merged.get("GITHUB_REPO", "RentalApp-Build").strip()
 
     if not owner:
         print("ERROR: GITHUB_ORG not set in bootstrap/.env")
@@ -173,6 +175,12 @@ def main() -> None:
         # ACR (from local .env)
         "ACR_NAME":               acr_name,
         "ACR_LOGIN_SERVER":       acr_login_server,
+
+        # GCP (from local .env or platform)
+        "GCP_PROJECT_ID":                 merged.get("GCP_PROJECT_ID", ""),
+        "GCP_SERVICE_ACCOUNT":            merged.get("GCP_SERVICE_ACCOUNT", ""),
+        "GCR_REGION":                     merged.get("GCR_REGION", ""),
+        "GCP_WORKLOAD_IDENTITY_PROVIDER": merged.get("GCP_WORKLOAD_IDENTITY_PROVIDER", ""),
 
         # Docker Hub (from local .env)
         "DOCKERHUB_USERNAME":     merged.get("DOCKERHUB_USERNAME", ""),
