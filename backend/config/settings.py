@@ -11,7 +11,11 @@ if not _secret:
         raise RuntimeError("SECRET_KEY environment variable must be set when DEBUG=False.")
     _secret = "dev-only-fallback-not-for-production"
 SECRET_KEY = _secret
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()]
+_allowed_hosts = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()]
+_pod_ip = os.getenv("POD_IP", "")
+if _pod_ip and _pod_ip not in _allowed_hosts:
+    _allowed_hosts.append(_pod_ip)
+ALLOWED_HOSTS = _allowed_hosts
 
 INSTALLED_APPS = [
     "django.contrib.admin",
