@@ -43,8 +43,16 @@ COPY logo.png ./logo.png
 COPY entrypoint.sh ./entrypoint.sh
 
 RUN mkdir -p media staticfiles \
-    && chmod +x ./entrypoint.sh \
-    && chown -R appuser:appgroup /app
+    && chmod +x ./entrypoint.sh
+
+# Pre-collect static files at build time (as root) so the read-only runtime
+# filesystem is not an issue. SECRET_KEY is only needed for collectstatic
+# to import settings — it is overridden at runtime via the K8s secret.
+RUN SECRET_KEY="build-time-placeholder" \
+    python manage.py collectstatic --noinput --clear
+
+# Hand ownership of everything to appuser AFTER collectstatic writes files
+RUN chown -R appuser:appgroup /app
 
 USER appuser
 

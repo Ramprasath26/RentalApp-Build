@@ -8,8 +8,10 @@ if [ "${RUN_MIGRATIONS}" = "true" ]; then
 fi
 
 # Collect static files (required for Django admin CSS in production)
-echo "[entrypoint] Collecting static files..."
-python manage.py collectstatic --noinput --clear
+# NOTE: staticfiles are pre-collected at image build time (see Dockerfile).
+# Skip at runtime to avoid read-only filesystem errors.
+# echo "[entrypoint] Collecting static files..."
+# python manage.py collectstatic --noinput --clear
 
 echo "[entrypoint] Starting Gunicorn on 0.0.0.0:${PORT:-8000}..."
 exec gunicorn config.wsgi:application \
