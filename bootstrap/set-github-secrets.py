@@ -48,8 +48,9 @@ def kv_get_secret(vault_name: str, secret_name: str) -> str:
     if not vault_name:
         return ""
     try:
+        az_cmd = "az.cmd" if sys.platform == "win32" else "az"
         result = subprocess.run(
-            ["az", "keyvault", "secret", "show",
+            [az_cmd, "keyvault", "secret", "show",
              "--vault-name", vault_name,
              "--name", secret_name,
              "--query", "value", "-o", "tsv"],
