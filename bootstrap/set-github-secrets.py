@@ -178,6 +178,11 @@ def main() -> None:
     dockerhub_user = env.get("DOCKERHUB_USERNAME", "")
     sonar_host     = env.get("SONAR_HOST_URL", "")
 
+    # ── Fetch app secrets from App Key Vault ─────────────────────────────────
+    app_kv_name = env.get("KEY_VAULT_NAME", "")
+    acr_login_server = kv_get_secret(app_kv_name, "acr-login-server") if app_kv_name else ""
+    acr_name = acr_login_server.split(".")[0] if acr_login_server else ""
+
     # ── Build secret map ─────────────────────────────────────────────────────
     secret_map = {
         # Azure OIDC auth
@@ -190,13 +195,16 @@ def main() -> None:
         # SonarQube (optional)
         "SONAR_TOKEN":           sonar_token,
         "SONAR_HOST_URL":        sonar_host,
-        # NOTE: ACR_NAME / ACR_LOGIN_SERVER are NOT static secrets.
-        # The build workflow fetches acr-login-server from Key Vault at runtime
-        # after Terraform apply writes it there.
+        # ACR specifics
+        "ACR_LOGIN_SERVER":      acr_login_server,
+        "ACR_NAME":              acr_name,
     }
 
     # Drop empty values
     secrets = {k: v for k, v in secret_map.items() if v and "<" not in v}
+
+    if not acr_login_server:
+        print("  ⚠  Warning: ACR_LOGIN_SERVER not found in App Key Vault. (Has Terraform been applied?)")
 
     # ── PAT: KV → interactive prompt ─────────────────────────────────────────
     token = kv_get_secret(kv_name, "github-pat")
