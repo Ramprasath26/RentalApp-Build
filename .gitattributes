@@ -1,0 +1,2 @@
+* text=auto eol=lf
+*.{sh,py,yml,yaml,json,js,ts,tsx,css,html} text eol=lf

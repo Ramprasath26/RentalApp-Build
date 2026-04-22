@@ -89,6 +89,17 @@ jobs:
             --severity-level medium \
             --confidence-level medium || true
 
+      # ── Trivy SCA & Secret Scan ─────────────────────────────────────────────
+      - name: Trivy FS & Secret Scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1' # Fail on vulnerabilities/secrets
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
       # ── Django check ────────────────────────────────────────────────────────
       # --fail-level ERROR: W-level warnings (HSTS, SSL redirect) are advisory
       # and handled by the AKS ingress/load-balancer — not by Django directly.
@@ -145,7 +156,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         working-directory: frontend
@@ -245,6 +256,14 @@ jobs:
             ${{ env.DOCKERHUB_IMAGE }}:${{ needs.image-meta.outputs.tags_suffix }}
           cache-from: type=registry,ref=${{ env.DOCKERHUB_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKERHUB_IMAGE }}:buildcache,mode=max
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        with:
+          image-ref: ${{ env.DOCKERHUB_IMAGE }}:${{ needs.image-meta.outputs.tags_suffix }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.title=RentalApp API
@@ -293,6 +312,14 @@ jobs:
           cache-from: type=registry,ref=${{ env.ACR_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.ACR_IMAGE }}:buildcache,mode=max
 
+      - name: Run Trivy Backend image scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        with:
+          image-ref: ${{ env.ACR_IMAGE }}:${{ needs.image-meta.outputs.short_sha }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
       - name: Build & push Frontend to ACR
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8  # v6
         with:
@@ -305,6 +332,14 @@ jobs:
             ${{ env.ACR_FRONTEND_IMAGE }}:${{ needs.image-meta.outputs.tags_suffix }}
           cache-from: type=registry,ref=${{ env.ACR_FRONTEND_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.ACR_FRONTEND_IMAGE }}:buildcache,mode=max
+
+      - name: Run Trivy Frontend image scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        with:
+          image-ref: ${{ env.ACR_FRONTEND_IMAGE }}:${{ needs.image-meta.outputs.short_sha }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
 
       - name: Install cosign
         uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac  # v3
@@ -392,6 +427,14 @@ jobs:
             ${{ env.GCR_IMAGE }}:${{ needs.image-meta.outputs.tags_suffix }}
           cache-from: type=registry,ref=${{ env.GCR_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.GCR_IMAGE }}:buildcache,mode=max
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+        with:
+          image-ref: ${{ env.GCR_IMAGE }}:${{ needs.image-meta.outputs.short_sha }}
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.title=RentalApp API
